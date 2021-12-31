@@ -1,0 +1,84 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Drop na nowy rok</title>
+  </head>
+  <body>
+    <label for="min">Minuta: </label>
+    <input type="number" id="min" />
+    <label for="sec">Sekunda: </label>
+    <input type="number" id="sec" />
+    <br/>
+    <label for="link">Link do filmu: </label>
+    <input type="text" id="link">
+
+    <input type="button" value="O której puścić" onclick="go()" />
+    <br />
+
+    <h1 id="out">Puść o: </a>
+    <br />
+    <h1 id="time"></h1>
+    <br />
+    <h2 id="za">Puść za: </h2>
+
+    <br />
+    <iframe width="420" height="315" id="yt"
+    allowfullscreen="allowfullscreen"
+    mozallowfullscreen="mozallowfullscreen" 
+    msallowfullscreen="msallowfullscreen" 
+    oallowfullscreen="oallowfullscreen" 
+    webkitallowfullscreen="webkitallowfullscreen"
+      src="">
+    </iframe>
+
+    <script src="https://unpkg.com/dayjs@1.8.21/dayjs.min.js"></script>
+    <script src="https://unpkg.com/dayjs@1.8.21/plugin/relativeTime.js"></script>
+    <script src="https://unpkg.com/dayjs@1.8.21/plugin/updateLocale.js"></script>
+
+    <script defer>
+      dayjs.extend(window.dayjs_plugin_relativeTime)
+      dayjs.extend(window.dayjs_plugin_updateLocale)
+      dayjs.updateLocale('en', {
+        relativeTime: {
+          future: "in %s",
+          past: "%s ago",
+          s: '%d seconds',
+          m: "a minute",
+          mm: "%d minutes",
+          h: "an hour",
+          hh: "%d hours",
+          d: "a day",
+          dd: "%d days",
+          M: "a month",
+          MM: "%d months",
+          y: "a year",
+          yy: "%d years"
+        }
+      })
+      var time = setInterval(() => {
+        document.querySelector("#time").innerHTML = "Aktaulny czas: "+dayjs().format("HH:mm:ss")
+      }, 100);
+      function go() {
+        let min = document.querySelector("#min").value;
+        let sec = document.querySelector("#sec").value;
+        let sylwester = dayjs().add(1, "d").hour(0).minute(0).second(0);
+        let docelowa = sylwester.subtract(min, "m").subtract(sec, "s");
+
+        var myregexp = /youtu(?:.*\/v\/|.*v\=|\.be\/)([A-Za-z0-9_\-]{11})/;
+        document.querySelector("#yt").src = `https://www.youtube.com/embed/${document.querySelector("#link").value.match(myregexp)[1]}`
+        console.log(document.querySelector("#yt").src)
+
+        document.querySelector("#out").innerHTML =
+          "Zacznij o: " + docelowa.format("HH:mm:ss");
+
+        clearInterval(time);
+        time = setInterval(()=>{
+          document.querySelector("#time").innerHTML = "Aktaulny czas: "+dayjs().format("HH:mm:ss")
+          document.querySelector("#za").innerHTML = "Puść za: " + dayjs().to(docelowa, true)
+        },100)
+      }
+    </script>
+  </body>
+</html>
